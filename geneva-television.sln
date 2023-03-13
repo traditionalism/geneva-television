@@ -4,8 +4,6 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "geneva-television.Client", "Client\geneva-television.Client.csproj", "{31359138-CAAC-4EC2-82CF-45EF3151219C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "geneva-television.Server", "Server\geneva-television.Server.csproj", "{C0365E9E-345C-4CCD-AE30-EB0FBDB7E1C3}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
