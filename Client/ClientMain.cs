@@ -64,7 +64,7 @@ namespace geneva_television.Client
         private int _renderTargetId;
         private int _cam;
         private int _currentChannel = 1;
-        private const float CurrentVolume = -4f;
+        private const float CurrentVolume = 0f;
         private bool _isChangingVolume;
         private const float VolumeChangeSpeed = 0.5f;
         private const float VolumeChangeDelay = 0.2f;

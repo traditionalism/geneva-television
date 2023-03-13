@@ -12,7 +12,7 @@ mklink /d X:\cfx-server-data\resources\[local]\geneva-television dist
 Afterwards, you can use `ensure geneva-television` in your server.cfg or server console to start the resource.
 
 NOTE: This resource really isn't meant to be used on a live server... at all. As it does nothing to sync anything. But, if someone would like to use any of this code to make a full resource made to be used on live servers -- i'm okay with that. This is nothing more than a cool remake & concept.
-cont. This resource currently works with five (5) TV's around the map. Those are the TV in Trevor's/Floyds apt., TV in Jimmy's room, TV in Trevor's trailer, TV in Franklin's vinewood safehouse, TV in Franklin's Aunt's house.
+cont. This resource currently works with five (5) TV's around the map. Those are the TV's in Trevor's/Floyd's apt., TV in Jimmy's room, TV in Trevor's trailer, TV in Franklin's vinewood safehouse, TV in Franklin's Aunt's house.
 
 ## Features
 * Automatically turn off TV if you leave the housing interior of the TV.
