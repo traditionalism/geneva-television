@@ -9,21 +9,18 @@ cd /d [PATH TO THIS RESOURCE]
 mklink /d X:\cfx-server-data\resources\[local]\geneva-television dist
 ```
 
-DISCLAIMER!! THIS IS ONLY SETUP TO WORK RIGHT NOW WITH FRANKLIN'S VINEWOOD SAFEHOUSE, IF YOU ATTEMPT TO USE IT ELSEWHERE, IT WILL NOT WORK. THIS'LL CHANGE IN THE FUTURE.
-
 Afterwards, you can use `ensure geneva-television` in your server.cfg or server console to start the resource.
 
+NOTE: This resource really isn't meant to be used on a live server... at all. As it does nothing to sync anything. But, if someone would like to use any of this code to make a full resource made to be used on live servers -- i'm okay with that. This is nothing more than a cool remake & concept.
+cont. This resource currently works with five (5) TV's around the map. Those are the TV in Trevor's/Floyds apt., TV in Jimmy's room, TV in Trevor's trailer, TV in Franklin's vinewood safehouse, TV in Franklin's Aunt's house.
+
 ## Features
-* Fairly optimized.
+* Automatically turn off TV if you leave the housing interior of the TV.
 * Very close to a 1:1 replica of television from vanilla GTA5.
 * It's just cool.
+
 ### Planned
-* Configuration.
-* Cleanup code.
-* Actually implement statebags. (a.k.a. sync this shi lol)
+* Not sure.
 
 ## Preview
 [Youtube](https://www.youtube.com/watch?v=RTDLxcxMHY0)
-
-## Configuration
-Nothing! In the future, I may decided to add a small configuration file.

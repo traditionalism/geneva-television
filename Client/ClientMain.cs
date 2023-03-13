@@ -9,12 +9,31 @@ namespace geneva_television.Client
 {
     public class ClientMain : BaseScript
     {
-        private readonly List<int> _televisionModels = new()
+        private readonly Dictionary<int, int> _televisionRooms = new()
         {
-            GetHashKey("prop_tv_flat_02"),
-            GetHashKey("prop_tv_03"),
-            GetHashKey("prop_tv_flat_01"),
-            GetHashKey("des_tvsmash_start")
+            { 1411597561, GetHashKey("prop_tv_flat_01") },
+            { 1961042103, GetHashKey("des_tvsmash_start") },
+            { 1541752721, GetHashKey("prop_tv_flat_02") },
+            { -1073987335, GetHashKey("prop_tv_03") },
+            { -1913322317, GetHashKey("prop_trev_tv_01") }
+        };
+
+        private readonly Dictionary<int, Vector3> _televisionPositions = new()
+        {
+            { 1411597561, new Vector3(2.5724f, 527.9989f, 176.1619f) },
+            { 1961042103, new Vector3(-808.3051f, 171.2623f, 77.2822f) },
+            { 1541752721, new Vector3(-1160.5024f, -1520.7598f, 10.7393f) },
+            { -1073987335, new Vector3(-9.8135f, -1440.9128f, 31.3654f) },
+            { -1913322317, new Vector3(1978.2303f, 3819.6504f, 34.2724f) }
+        };
+
+        private readonly Dictionary<int, Vector3> _televisionRotations = new()
+        {
+            { 1411597561, new Vector3(0f, 0f, -29.9488f) },
+            { 1961042103, new Vector3(1.8886f, 0f, 110.9232f) },
+            { 1541752721, new Vector3(0f, 0f, 60.061f) },
+            { -1073987335, new Vector3(0f, 0f, -134.3211f) },
+            { -1913322317, new Vector3(0f, 0f, -105.15f) }
         };
         
         private readonly Dictionary<int, string> _channels = new()
@@ -39,7 +58,7 @@ namespace geneva_television.Client
             { 19, "PL_WEB_RANGERS" }
         };
         
-        private Prop _closestTv;
+        private Entity _closestTv;
         private bool _tvOn;
         private bool _focusingTv;
         private int _renderTargetId;
@@ -92,6 +111,7 @@ namespace geneva_television.Client
                 SetCamActive(_cam, false);
                 RenderScriptCams(false, false, 3000, true, false);
                 SetPlayerControl(Game.Player.Handle, true, 0);
+                DestroyAllCams(false);
                 
                 SetTvChannel(-1);
                 EnableMovieSubtitles(false);
@@ -244,27 +264,22 @@ namespace geneva_television.Client
             await Delay(2000);
         }
 
-        [Command("reset")]
-        private void Reset()
-        {
-            SetPlayerControl(Game.Player.Handle, true, 0);
-            Game.PlayerPed.IsPositionFrozen = false;
-            Game.PlayerPed.IsVisible = true;
-            Game.PlayerPed.IsInvincible = false;
-        }
-
         private async Task WatchTv()
         {
             if (_tvOn && !_focusingTv)
             {
+                Vector3 televisionPosition = _televisionPositions[GetRoomKeyFromEntity(_closestTv.Handle)];
+                Vector3 televisionRotation = _televisionRotations[GetRoomKeyFromEntity(_closestTv.Handle)];
+                _cam = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", televisionPosition.X, televisionPosition.Y, televisionPosition.Z, televisionRotation.X, televisionRotation.Y, televisionRotation.Z, 50f, false, 2);
+                SetCamFarClip(_cam, 100f);
                 SetCamActive(_cam, true);
                 RenderScriptCams(true, false, 3000, true, false);
-                Game.PlayerPed.Task.LookAt(_closestTv, -1);
                 Game.PlayerPed.IsPositionFrozen = true;
-                Game.PlayerPed.IsVisible = false;
-                Game.PlayerPed.IsInvincible = true;
                 Game.PlayerPed.Task.ClearAll();
                 SetPlayerControl(Game.Player.Handle, false, 0);
+                Game.PlayerPed.Task.LookAt(_closestTv, -1);
+                Game.PlayerPed.IsVisible = false;
+                Game.PlayerPed.IsInvincible = true;
                 
                 _focusingTv = true;
                 Tick += HandleTvOnStuffTick;
@@ -295,17 +310,19 @@ namespace geneva_television.Client
                 
                 _tvOn = true;
                 _focusingTv = true;
-
-                _cam = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", 2.5724f, 527.9989f, 176.1619f, 0f, 0f, -29.9488f, 50f, false, 2);
+                
+                Vector3 televisionPosition = _televisionPositions[GetRoomKeyFromEntity(_closestTv.Handle)];
+                Vector3 televisionRotation = _televisionRotations[GetRoomKeyFromEntity(_closestTv.Handle)];
+                _cam = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", televisionPosition.X, televisionPosition.Y, televisionPosition.Z, televisionRotation.X, televisionRotation.Y, televisionRotation.Z, 50f, false, 2);
                 SetCamFarClip(_cam, 100f);
                 SetCamActive(_cam, true);
                 RenderScriptCams(true, false, 3000, true, false);
                 Game.PlayerPed.IsPositionFrozen = true;
-                Game.PlayerPed.IsVisible = false;
-                Game.PlayerPed.IsInvincible = true;
                 Game.PlayerPed.Task.ClearAll();
                 SetPlayerControl(Game.Player.Handle, false, 0);
                 Game.PlayerPed.Task.LookAt(_closestTv, -1);
+                Game.PlayerPed.IsVisible = false;
+                Game.PlayerPed.IsInvincible = true;
                 
                 Tick += HandleTvOnStuffTick;
                 Tick += TrackInteriorTick;
@@ -316,27 +333,60 @@ namespace geneva_television.Client
         private async Task FindTvTick()
         {
             Vector3 plyPos = Game.PlayerPed.Position;
-            Prop prop = World.GetAllProps()
-                .Where(p => _televisionModels.Contains(p.Model))
-                .OrderBy(p => Vector3.DistanceSquared(p.Position, plyPos))
+            Entity entity = World.GetAllProps()
+                .Where(i => _televisionRooms.ContainsKey(GetRoomKeyFromEntity(i.Handle)) && i.Model.Hash == _televisionRooms[GetRoomKeyFromEntity(i.Handle)])
+                .OrderBy(i => Vector3.DistanceSquared(i.Position, plyPos))
                 .FirstOrDefault();
-            
-            if (prop is null || HasObjectBeenBroken(prop.Handle) || GetRoomKeyFromEntity(Game.PlayerPed.Handle) != GetRoomKeyFromEntity(prop.Handle))
+
+            if (entity is null || HasObjectBeenBroken(entity.Handle))
             {
-                await Delay(3500);
+                await Delay(3000);
                 return;
             }
-
+            
+            _closestTv = entity;
+            
+            if (Vector3.DistanceSquared(_closestTv.Position, plyPos) > 3f)
+            {
+                await Delay(1500);
+                return;
+            }
+                
             if (!_focusingTv)
             {
                 Screen.DisplayHelpTextThisFrame(_tvOn ? "Press ~INPUT_CONTEXT~ to watch TV." : "Press ~INPUT_CONTEXT~ to turn on the TV.");
                 
                 if (Game.IsControlJustReleased(0, Control.Context))
                 {
-                    _closestTv = prop;
                     await WatchTv();
                 }
             }
         }
-    }
+
+        [Tick]
+        private async Task BlockWeaponsInsideTick()
+        {
+            if (_closestTv is null)
+            {
+                await Delay(1500);
+                return;
+            }
+            
+            int currentInterior = GetInteriorFromEntity(Game.PlayerPed.Handle);
+            int tvInterior = GetInteriorFromEntity(_closestTv.Handle);
+            
+            if (currentInterior == tvInterior && Game.PlayerPed.Weapons.Current.Hash != WeaponHash.Unarmed)
+            {
+                Screen.DisplayHelpTextThisFrame("A weapon cannot be equipped when in a safehouse.");
+                Game.PlayerPed.Weapons.Select(WeaponHash.Unarmed);
+                Game.PlayerPed.SetConfigFlag(48, true);
+            }
+            else if (Game.PlayerPed.GetConfigFlag(48) && currentInterior != tvInterior)
+            {
+                Game.PlayerPed.SetConfigFlag(48, false);
+            }
+
+            await Delay(2000);
+        }
+    }    
 }
