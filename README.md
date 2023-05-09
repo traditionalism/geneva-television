@@ -23,4 +23,4 @@ cont. This resource currently works with five (5) TV's around the map. Those are
 * Not sure.
 
 ## Preview
-[Youtube](https://www.youtube.com/watch?v=RTDLxcxMHY0)
+[Youtube](https://youtu.be/u1DQNll3G9k)
